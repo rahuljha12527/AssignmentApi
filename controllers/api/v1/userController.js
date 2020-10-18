@@ -41,4 +41,30 @@ module.exports.register=async function(req,res){
     }
 };
 
+module.exports.login=async function(req,res){
+    try{
+      let user=await User.findOne({email:req.body.email});
+      if(!user || user.password!=req.body.password){
+          return res.json(422,{
+              message:"Invalid username and password",
+          });
+      }
+      return res.json(200,{
+          message:"Sign in,Successfull, here is your token and keep it safe",
+          data:{
+              token:jwt.sign(user.toJSON(),"userApi",{
+                  expiresIn:"100000000"
+              }),
+              user,
+          },
+      });
+
+    }catch(err){
+       console.log("*********",err);
+       return res.json(500,{
+           message:"Internal Server Error",
+       });
+    }
+}
+
 
